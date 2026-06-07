@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "AI Web Page Summarizer",
+  "version": "1.0",
+  "description": "Summarize any web page instantly using Chrome's built-in on-device AI.",
+  "permissions": ["sidePanel", "tabs", "scripting"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "side_panel": {
+    "default_path": "sidepanel/sidepanel.html"
+  },
+  "action": {
+    "default_title": "Summarize Page"
+  }
+}

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Summarizer</title>
+  <link rel="stylesheet" href="sidepanel.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          <path d="M8 10h8"></path>
+          <path d="M8 14h4"></path>
+        </svg>
+        <h1>Summarizer</h1>
+      </div>
+      <p class="subtitle">Extract insights instantly</p>
+    </header>
+
+    <main>
+      <button id="summarize-btn" class="primary-btn">
+        <span class="btn-text">Summarize Page</span>
+        <div class="loader hidden" id="btn-loader"></div>
+      </button>
+
+      <div id="status-container" class="status-container hidden">
+        <p id="status-text"></p>
+      </div>
+
+      <div id="summary-container" class="summary-container hidden">
+        <h2>Summary</h2>
+        <div id="summary-content" class="summary-content"></div>
+      </div>
+      
+      <div id="setup-instructions" class="setup-instructions hidden">
+        <h3>Prompt API Not Enabled</h3>
+        <p>To use this free on-device AI, please enable it in Chrome:</p>
+        <ol>
+          <li>Go to <code>chrome://flags/#prompt-api-for-gemini-nano</code> and set to <strong>Enabled</strong></li>
+          <li>Go to <code>chrome://flags/#optimization-guide-on-device-model</code> and set to <strong>Enabled BypassPrefRequirement</strong></li>
+          <li>Relaunch Chrome</li>
+          <li>Go to <code>chrome://components</code>, find <strong>Optimization Guide On Device Model</strong> and click Check for update.</li>
+        </ol>
+      </div>
+    </main>
+  </div>
+  <script src="sidepanel.js"></script>
+</body>
+</html>
