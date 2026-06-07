@@ -6,6 +6,9 @@ const statusText = document.getElementById('status-text');
 const summaryContainer = document.getElementById('summary-container');
 const summaryContent = document.getElementById('summary-content');
 const setupInstructions = document.getElementById('setup-instructions');
+const copyBtn = document.getElementById('copy-btn');
+const formatSelect = document.getElementById('format-select');
+const customQueryInput = document.getElementById('custom-query');
 
 function showStatus(text) {
   statusContainer.classList.remove('hidden');
@@ -28,6 +31,33 @@ function setBtnLoading(isLoading) {
   }
 }
 
+copyBtn.addEventListener('click', async () => {
+  const textToCopy = summaryContent.innerText;
+  if (!textToCopy) return;
+  
+  try {
+    await navigator.clipboard.writeText(textToCopy);
+    copyBtn.classList.add('copied');
+    copyBtn.innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 6L9 17l-5-5"></path>
+      </svg>
+    `;
+    
+    setTimeout(() => {
+      copyBtn.classList.remove('copied');
+      copyBtn.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+        </svg>
+      `;
+    }, 2000);
+  } catch (err) {
+    console.error('Failed to copy text: ', err);
+  }
+});
+
 btn.addEventListener('click', async () => {
   setBtnLoading(true);
   hideStatus();
@@ -38,7 +68,6 @@ btn.addEventListener('click', async () => {
   try {
     // 1. Check Prompt API availability
     if (!globalThis.LanguageModel) {
-      // The API is completely missing from this browser version
       setupInstructions.classList.remove('hidden');
       setBtnLoading(false);
       return;
@@ -50,7 +79,6 @@ btn.addEventListener('click', async () => {
     });
 
     if (availability === 'unavailable') {
-      // The API exists but the model is unavailable (flags not set correctly)
       setupInstructions.classList.remove('hidden');
       setBtnLoading(false);
       return;
@@ -69,11 +97,8 @@ btn.addEventListener('click', async () => {
     const [{ result: pageText }] = await chrome.scripting.executeScript({
       target: { tabId: tab.id },
       func: () => {
-        // Clone body to avoid messing with live DOM
         const body = document.body.cloneNode(true);
-        // Remove noise
         body.querySelectorAll('script, style, nav, footer, header, noscript, iframe').forEach(el => el.remove());
-        // Return text, limited to 5000 chars to avoid overwhelming the prompt
         return body.innerText.substring(0, 5000);
       }
     });
@@ -84,13 +109,29 @@ btn.addEventListener('click', async () => {
       return;
     }
 
-    // 3. Create Session and Stream Summary
+    // 3. Build Prompt Strategy
+    const format = formatSelect.value;
+    const customQuery = customQueryInput.value.trim();
+    
+    let systemInstruction = 'You are a helpful reading assistant.';
+    if (format === 'bullet') systemInstruction += ' Output your response in clear markdown bullet points.';
+    if (format === 'paragraph') systemInstruction += ' Output your response as a single, concise paragraph.';
+    if (format === 'detailed') systemInstruction += ' Output your response as a detailed, multi-paragraph explanation with headers if necessary.';
+
+    let userPrompt = '';
+    if (customQuery) {
+      userPrompt = `Please answer this question based on the text below:\n\nQuestion: ${customQuery}\n\nText:\n${pageText}`;
+    } else {
+      userPrompt = `Please summarize the following text according to your instructions:\n\n${pageText}`;
+    }
+
+    // 4. Create Session and Stream Summary
     showStatus('Initializing AI model...');
     
     const session = await LanguageModel.create({
       expectedInputs: [{ type: "text", languages: ["en"] }],
       expectedOutputs: [{ type: "text", languages: ["en"] }],
-      initialPrompts: [{ role: 'system', content: 'You are a helpful assistant. Summarize the provided web page content clearly and concisely using markdown bullet points.' }],
+      initialPrompts: [{ role: 'system', content: systemInstruction }],
       monitor(m) {
         m.addEventListener('downloadprogress', (e) => {
           const pct = e.total ? Math.floor((e.loaded / e.total) * 100) : 0;
@@ -102,8 +143,8 @@ btn.addEventListener('click', async () => {
     hideStatus();
     summaryContainer.classList.remove('hidden');
 
-    for await (const chunk of session.promptStreaming(`Summarize the following text:\n\n${pageText}`)) {
-      summaryContent.textContent += chunk; // Append as the stream arrives
+    for await (const chunk of session.promptStreaming(userPrompt)) {
+      summaryContent.textContent += chunk; 
     }
 
     session.destroy();

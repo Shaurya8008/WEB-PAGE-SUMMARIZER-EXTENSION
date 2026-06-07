@@ -22,17 +22,41 @@
     </header>
 
     <main>
-      <button id="summarize-btn" class="primary-btn">
-        <span class="btn-text">Summarize Page</span>
-        <div class="loader hidden" id="btn-loader"></div>
-      </button>
+      <div class="controls-card">
+        <div class="input-group">
+          <label for="format-select">Format</label>
+          <select id="format-select" class="form-select">
+            <option value="bullet">Bullet Points</option>
+            <option value="paragraph">Short Paragraph</option>
+            <option value="detailed">Detailed Explanation</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label for="custom-query">Ask a specific question (Optional)</label>
+          <input type="text" id="custom-query" class="form-input" placeholder="e.g. What is the main conclusion?">
+        </div>
+
+        <button id="summarize-btn" class="primary-btn">
+          <span class="btn-text">Generate Insight</span>
+          <div class="loader hidden" id="btn-loader"></div>
+        </button>
+      </div>
 
       <div id="status-container" class="status-container hidden">
         <p id="status-text"></p>
       </div>
 
       <div id="summary-container" class="summary-container hidden">
-        <h2>Summary</h2>
+        <div class="summary-header">
+          <h2>Result</h2>
+          <button id="copy-btn" class="icon-btn" title="Copy to clipboard">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+          </button>
+        </div>
         <div id="summary-content" class="summary-content"></div>
       </div>
       

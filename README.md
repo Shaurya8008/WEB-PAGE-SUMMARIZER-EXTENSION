@@ -5,6 +5,9 @@ A modern, fast, and 100% free Chrome Extension that summarizes any web page inst
 ## ✨ Features
 - **On-Device AI:** Runs locally using Gemini Nano directly in your browser. No API keys needed!
 - **Privacy First:** Your data never leaves your machine.
+- **Custom Prompts:** Ask specific questions about the page content or get a general summary.
+- **Format Options:** Choose between Bullet Points, a Short Paragraph, or a Detailed Explanation.
+- **Copy to Clipboard:** Instantly copy the AI's response with a single click.
 - **Sleek Side Panel:** A beautiful glassmorphic UI with dark mode support.
 - **Smart Extraction:** Automatically strips away navigation bars, footers, and ads to only summarize the core content.
 
